@@ -1,6 +1,4 @@
-def main():
-    print("Hello from fuzzy!")
-
+from src.demo import run
 
 if __name__ == "__main__":
-    main()
+    run()
