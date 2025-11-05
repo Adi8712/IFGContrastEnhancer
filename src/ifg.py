@@ -1,8 +1,16 @@
 import cv2
 import numpy as np
-from .utils import normalise
-from .metrics import entropy
+
+def entropy(gray):
+    hist = cv2.calcHist([gray], [0], None, [256], [0, 256]).ravel()
+    p = hist / hist.sum()
+    p = p[p > 0]
+    return -np.sum(p * np.log2(p))
  
+def normalise(x):
+    x = x.astype(np.float32)
+    return(x - x.min()) / (x.max() - x.min() + 1e-9)
+
 def compute(norm, k):
     mu = norm ** k
     nu = (1 - norm) ** k
