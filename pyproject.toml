@@ -1,6 +1,6 @@
 [project]
 name = "ifg-based-contrast-enhancement"
-version = "1.0.0"
+version = "1.0.3"
 description = "Low-contrast color image enhancement using an IFG + CLAHE pipeline with a Qt GUI"
 readme = "README.md"
 requires-python = ">=3.11"
