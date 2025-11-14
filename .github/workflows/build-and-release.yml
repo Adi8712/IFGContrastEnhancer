@@ -94,18 +94,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-
-      - name: Prepare release assets
-        run: |
-          mkdir -p release-assets
-          find artifacts -type f \( -name "*.exe" -o -name "checksum.txt" \) -exec cp {} release-assets/ \; 2>/dev/null || true
-
-          echo "SHA256 Checksums:" > release-assets/checksum.txt
-          find release-assets -type f ! -name "checksum.txt" ! -name "checksum.txt" -exec sha256sum {} \; >> release-assets/checksum.txt 2>/dev/null || true
-          cat release-assets/*/checksum.txt >> release-assets/checksum.txt 2>/dev/null || true
-
-          echo "Final assets:"
-          ls -la release-assets/
       
       - name: Prepare release assets
         run: |
