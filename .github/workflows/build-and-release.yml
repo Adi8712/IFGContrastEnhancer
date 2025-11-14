@@ -20,6 +20,7 @@ jobs:
             runner: macos-latest
           - os: windows
             runner: windows-latest
+      fail-fast: false
 
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -63,26 +64,14 @@ jobs:
           pyinstaller --noconfirm --onefile --clean \
             --name "IFGContrastEnhancer-${{ steps.version.outputs.version }}-${{ matrix.os }}" --optimize 2 main.py
 
-      - name: Package binary
-        shell: bash
-        run: |
-          BIN="dist/IFGContrastEnhancer-${{ steps.version.outputs.version }}-${{ matrix.os }}"
-          NAME="IFGContrastEnhancer-${{ steps.version.outputs.version }}-${{ matrix.os }}"
-
-          if [[ "${{ matrix.os }}" == "windows" ]]; then
-            powershell -Command "Compress-Archive -Path '$BIN.exe' -DestinationPath 'dist/$NAME.zip' -Force"
-          else
-            tar -czf "dist/$NAME.tar.gz" -C dist "$(basename "$BIN")"
-          fi
-
       - name: Generate checksum
         shell: bash
         run: |
           cd dist
           if command -v sha256sum >/dev/null 2>&1; then
-            sha256sum * > SHA256SUMS.txt
+            sha256sum * > checksum.txt
           else
-            powershell -Command "Get-FileHash -Algorithm SHA256 -Path * | Format-Table -AutoSize > SHA256SUMS.txt"
+            powershell -Command "Get-FileHash -Algorithm SHA256 -Path * | Select-Object Hash, @{Name='Path';Expression={(Split-Path \$_.Path -Leaf)}} | Format-Table -HideTableHeaders > checksum.txt"
           fi
 
       - name: Upload artifact
@@ -97,6 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    if: success() || failure()
     env:
       VERSION: ${{ needs.build.outputs.version }}
     steps:
@@ -108,10 +98,11 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
-          find artifacts -type f \( -name "*.exe" -o -name "*.tar.gz" -o -name "*.zip" -o -name "SHA256SUMS.txt" \) -exec cp {} release-assets/ \;
+          find artifacts -type f \( -name "*.exe" -o -name "checksum.txt" \) -exec cp {} release-assets/ \; 2>/dev/null || true
 
-          echo "SHA256 Checksums:" > release-assets/SHA256SUMS.txt
-          find release-assets -type f ! -name "SHA256SUMS.txt" -exec sha256sum {} \; >> release-assets/SHA256SUMS.txt
+          echo "SHA256 Checksums:" > release-assets/checksum.txt
+          find release-assets -type f ! -name "checksum.txt" ! -name "checksum.txt" -exec sha256sum {} \; >> release-assets/checksum.txt 2>/dev/null || true
+          cat release-assets/*/checksum.txt >> release-assets/checksum.txt 2>/dev/null || true
 
           echo "Final assets:"
           ls -la release-assets/
