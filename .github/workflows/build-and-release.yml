@@ -78,15 +78,14 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: assets-${{ matrix.os }}
-          path: dist/*
-
+          path: dist/IFGContrastEnhancer*
   release:
     name: Publish Release
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: success() || failure()
+    if: success()
     env:
       VERSION: ${{ needs.build.outputs.version }}
     steps:
@@ -98,8 +97,7 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
-          find artifacts -path "*/dist/*" -type f -exec cp {} release-assets/ \; 2>/dev/null || true
-
+          find artifacts -type f -exec cp {} release-assets/ \; 2>/dev/null || true
           echo "Checksums:" > release-assets/checksum.txt
           find release-assets -type f ! -name "checksum.txt" -exec sha256sum {} \; >> release-assets/checksum.txt 2>/dev/null || true
 
