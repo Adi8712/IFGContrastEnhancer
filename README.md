@@ -6,10 +6,21 @@
 
 ## Overview
 
-This application provides an easy-to-use interface for enhancing low-contrast images using the **Intuitionistic Fuzzy Generator (IFG)**–based algorithm introduced by **Selvam et al., 2024 (Information Fusion)**.
+This application enhances low-light and low-contrast images using a two-stage pipeline:
 
-It combines the novel IFG method with **Contrast Limited Adaptive Histogram Equalization (CLAHE)** to improve visibility and contrast in dark or low-illumination images.
-The project wraps this method in a **Qt-based GUI** for side-by-side visual comparison.
+1. **Intuitionistic Fuzzy Generator (IFG)**  
+   Transforms the luminance component of an image using fuzzy membership, non-membership, and hesitation principles, while optimizing the parameter *k* using entropy maximization.
+
+2. **Contrast Limited Adaptive Histogram Equalization (CLAHE)**  
+   Improves local contrast while suppressing noise.
+
+The GUI provides:
+
+- Interactive image loading (including drag-and-drop)
+- CLAHE and IFG enhancement
+- Side-by-side comparison (Original vs IFG, or CLAHE vs IFG)
+- Zooming, panning, and divider-based comparison
+- Exporting enhanced output images
 
 ---
 
@@ -27,42 +38,54 @@ source .venv/bin/activate       # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-Run the app:
+Run the application:
 
 ```bash
 python main.py
 ```
 
-### From Executable
+### From Executable (PyInstaller Build)
 
-If you built it with PyInstaller:
+If you built a standalone executable:
 
 ```bash
-./dist/IFGContrastEnhancer
+./dist/IFGContrastEnhancer        # Linux/macOS
+dist/IFGContrastEnhancer.exe      # Windows
 ```
 
 ---
 
 ## Usage
 
-1. **Open the application**
-   Launch `IFGContrastEnhancer` or run `python main.py`.
+1. **Launch the application**
+
+   ```bash
+   python main.py
+   ```
+
+   or run the packaged executable.
 
 2. **Load an image**
 
-   * The file dialog opens inside the bundled `samples/` folder by default.
-   * Supported formats: `.png`, `.jpg`, `.jpeg`, `.bmp`, `.tiff`.
+   * Opens inside the project's `samples/` directory by default
+   * Supported formats: `.png`, `.jpg`, `.jpeg`, `.bmp`, `.tiff`
+   * You may also drag-and-drop files onto the window
 
 3. **Run Enhancement**
 
-   * Click **Run Enhancement** to process the image using both CLAHE and IFG methods.
-   * The **left pane** shows the CLAHE-enhanced image.
-   * The **right pane** shows the IFG-enhanced result.
+   * Click **Run Enhancement**
+   * CLAHE and IFG-enhanced images will be generated
+   * The optimized *k* value is shown in the status bar
 
-4. **Compare & Export**
+4. **Compare results**
 
-   * Drag the divider line to compare the two results interactively.
-   * Use **Save CLAHE** or **Save IFG** to export individual outputs.
+   * Use the "Compare" tab for side-by-side comparison
+   * Switch between "Original vs IFG" and "CLAHE vs IFG"
+   * Drag the divider for interactive region comparison
+
+5. **Save output**
+
+   * Export the IFG-enhanced result as PNG or JPEG
 
 ---
 
@@ -70,28 +93,33 @@ If you built it with PyInstaller:
 
 ```
 .
-├── main.py                  # GUI and application entrypoint
-├── src/
-│   ├── __init__.py
-│   ├── clahe.py             # CLAHE enhancement module
-│   └── ifg.py               # IFG-based enhancement algorithm
-├── samples/                 # Sample images for testing
-├── pyproject.toml           # Project configuration
-├── requirements.txt         # Dependency list
-└── README.md
+├── build.sh                      # Cross-platform PyInstaller build helper
+├── main.py                       # Application entrypoint
+├── pyproject.toml                # Project metadata and dependencies
+├── requirements.txt              # Pinned package versions
+├── samples/                      # Optional sample input images
+└── src/
+    ├── enhancements/
+    │   ├── clahe.py              # CLAHE enhancement implementation
+    │   └── ifg.py                # IFG enhancement algorithm
+    ├── gui/
+    │   ├── image_views.py        # Image display and comparison widgets
+    │   ├── worker.py             # Background processing thread
+    │   └── main_window.py        # Main GUI layout and actions
+    └── utils/
+        └── resource.py           # PyInstaller-safe resource path handling
 ```
 
 ---
 
 ## Dependencies
 
-Core dependencies (see `requirements.txt`):
+The application relies on:
 
-* **Python ≥ 3.13**
-* `PySide6` — Qt-based GUI framework
-* `opencv-python` — Image processing
-* `numpy` — Numerical computation
-* `matplotlib` — Optional plotting utilities
+* Python
+* PySide6
+* OpenCV (opencv-python)
+* NumPy
 
 Install all dependencies with:
 
@@ -101,21 +129,41 @@ pip install -r requirements.txt
 
 ---
 
-## Packaging (Optional)
+## Building a Standalone Executable
 
-To build a standalone executable (using PyInstaller):
+The project includes a **platform-independent `build.sh`** script that works on:
+
+* Linux
+* macOS
+* Windows (via Git Bash, MSYS2, or WSL)
+
+It automatically:
+
+* Cleans old build artifacts
+* Packages the app using PyInstaller
+* Bundles the `samples/` directory if present
+
+### Run the build
 
 ```bash
-pyinstaller --onefile --name IFGContrastEnhancer --add-data "samples:samples" main.py
+chmod +x build.sh
+./build.sh
 ```
 
-This will generate a single packaged binary inside the `dist/` folder.
+The final executable will appear in:
+
+```
+dist/IFGContrastEnhancer      # Linux/macOS
+dist/IFGContrastEnhancer.exe  # Windows
+```
 
 ---
 
 ## Samples
 
-Sample images used for testing and demonstration were sourced from:
+The `samples/` directory contains optional demo images.
+When using the packaged executable, these images are bundled automatically (if present during build).
+
 [Google Drive – LOw Light paired dataset (LOL)](https://drive.google.com/open?id=157bjO1_cFuSd0HWDUuAmcHRJDVyWpOxB)
 
 These images are provided for educational and evaluation purposes.

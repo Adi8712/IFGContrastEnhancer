@@ -1,14 +1,15 @@
 [project]
 name = "ifg-based-contrast-enhancement"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "Low-contrast color image enhancement using an IFG + CLAHE pipeline with a Qt GUI"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
+
 dependencies = [
-    "matplotlib>=3.10.7",
-    "numpy>=2.3.4",
-    "opencv-python>=4.11.0.86",
-    "pyside6>=6.10.0",
+    "numpy>=2.3",
+    "opencv-python>=4.11",
+    "pyside6>=6.10",
 ]
+
 [project.scripts]
 ifg-enhance-gui = "main:main"

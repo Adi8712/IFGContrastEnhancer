@@ -1,1 +1,3 @@
-__all__ = ["clahe", "ifg"]
+"""Top-level package for the project"""
+
+__all__ = ["enhancements", "gui", "utils"]

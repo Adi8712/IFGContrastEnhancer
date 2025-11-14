@@ -1,64 +1,84 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Cross-platform build helper for PyInstaller
+# Usage: ./build.sh
+# - Bundles ./samples into the executable if the folder exists.
+# - Produces a single-file build in ./dist/
+# Notes:
+# - Run this script with a Python environment where pyinstaller is installed.
+# - On Windows run from Git Bash / MSYS2 / WSL or adapt to a PowerShell script.
 
 APP_NAME="IFGContrastEnhancer"
+ENTRY="main.py"
+DIST_DIR="./dist"
+BUILD_DIR="./build"
+SPEC_FILE="${APP_NAME}.spec"
 
-OS=$(uname -s)
+OS_UNAME="$(uname -s || echo Unknown)"
 
-build_command() {
-    local os_name=$1
-
-    local sample_data="samples:samples"
-    if [[ "$os_name" == "Windows" ]]; then
-        sample_data="samples;samples"
-    fi
-
-    local cmd="pyinstaller --onefile --name $APP_NAME --add-data $sample_data --optimize 2 --windowed --strip --clean --distpath ./dist --workpath \"./build\" main.py > /dev/null 2>&1"
-
-    eval "$cmd"
-
-    if [[ $? -ne 0 ]]; then
-        echo "Error: Build failed for $APP_NAME."
-        return 1
-    fi
-
-}
-
-build_platform() {
-    local platform=$1
-
-    echo "Building for $platform..."
-    build_command "$platform"
-    if [[ $? -ne 0 ]]; then
-        return 1
-    fi
-
-    case "$platform" in
-        Linux)
-            chmod +x ./dist/$APP_NAME
-            echo "Build complete. Run the application ./dist/$APP_NAME"
-            ;;
-        macOS)
-            chmod +x ./dist/$APP_NAME
-            echo "Build complete. Run the application ./dist/$APP_NAME"
-            ;;
-        Windows)
-            echo "Build complete. Run the application ./dist/$APP_NAME.exe"
-            ;;
+is_windows() {
+    case "${OS_UNAME}" in
+        CYGWIN*|MINGW32*|MSYS*|MINGW*) return 0 ;;
+        *) return 1 ;;
     esac
 }
 
-case "$OS" in
-    Linux)
-        build_platform "Linux"
-        ;;
-    Darwin)
-        build_platform "macOS"
-        ;;
-    CYGWIN*|MINGW32*|MSYS*|MINGW*)
-        build_platform "Windows"
-        ;;
-    *)
-        echo "Unsupported OS: $OS"
+is_mac() {
+    [[ "${OS_UNAME}" == "Darwin" ]]
+}
+
+is_linux() {
+    [[ "${OS_UNAME}" == "Linux" ]]
+}
+
+pyinstaller_common_flags=(--onefile --name "${APP_NAME}" --distpath "${DIST_DIR}" --workpath "${BUILD_DIR}" --clean --windowed)
+pyinstaller_unix_flags=(--strip)
+
+rm -rf "${DIST_DIR}" "${BUILD_DIR}" "${SPEC_FILE}"
+
+echo "Detected platform: ${OS_UNAME}"
+
+cmd=(pyinstaller "${pyinstaller_common_flags[@]}")
+if ! is_windows; then
+    cmd+=("${pyinstaller_unix_flags[@]}")
+fi
+if [ -d "samples" ]; then
+    echo "Including samples/ in bundle"
+    if is_windows; then
+        cmd+=("--add-data" "samples;samples")
+    else
+        cmd+=("--add-data" "samples:samples")
+    fi
+fi
+cmd+=("${ENTRY}")
+
+if is_windows; then
+    "${cmd[@]}" > /dev/null 2> /dev/null || {
+        echo "Error: PyInstaller build failed"
         exit 1
-        ;;
-esac
+    }
+else
+    if ! "${cmd[@]}" > /dev/null 2>&1; then
+        echo "Error: PyInstaller build failed"
+        exit 1
+    fi
+fi
+
+if is_windows; then
+    EXE_PATH="${DIST_DIR}/${APP_NAME}.exe"
+else
+    EXE_PATH="${DIST_DIR}/${APP_NAME}"
+    if [ -f "${EXE_PATH}" ]; then
+        chmod +x "${EXE_PATH}" || true
+    fi
+fi
+
+if [ -f "${EXE_PATH}" ]; then
+    echo "Build succeeded"
+    echo "Executable: ${EXE_PATH}"
+    exit 0
+else
+    echo "Build produced no executable"
+    exit 2
+fi
