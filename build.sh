@@ -32,7 +32,7 @@ is_linux() {
     [[ "${OS_UNAME}" == "Linux" ]]
 }
 
-pyinstaller_common_flags=(--onefile --name "${APP_NAME}" --distpath "${DIST_DIR}" --workpath "${BUILD_DIR}" --clean --windowed)
+pyinstaller_common_flags=(--onefile --name "${APP_NAME}" --distpath "${DIST_DIR}" --workpath "${BUILD_DIR}" --optimize 2 --clean --windowed)
 pyinstaller_unix_flags=(--strip)
 
 rm -rf "${DIST_DIR}" "${BUILD_DIR}" "${SPEC_FILE}"

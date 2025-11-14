@@ -1,8 +1,6 @@
 # IFG-Based Contrast Enhancement
 
-**A standalone, cross-platform application for low-contrast color image enhancement using the Intuitionistic Fuzzy Generator (IFG) approach.**
-
----
+A standalone, cross-platform application for low-contrast color image enhancement using the Intuitionistic Fuzzy Generator (IFG) approach.
 
 ## Overview
 
@@ -21,8 +19,6 @@ The GUI provides:
 - Side-by-side comparison (Original vs IFG, or CLAHE vs IFG)
 - Zooming, panning, and divider-based comparison
 - Exporting enhanced output images
-
----
 
 ## Installation
 
@@ -52,8 +48,6 @@ If you built a standalone executable:
 ./dist/IFGContrastEnhancer        # Linux/macOS
 dist/IFGContrastEnhancer.exe      # Windows
 ```
-
----
 
 ## Usage
 
@@ -87,8 +81,6 @@ dist/IFGContrastEnhancer.exe      # Windows
 
    * Export the IFG-enhanced result as PNG or JPEG
 
----
-
 ## Project Structure
 
 ```
@@ -110,8 +102,6 @@ dist/IFGContrastEnhancer.exe      # Windows
         └── resource.py           # PyInstaller-safe resource path handling
 ```
 
----
-
 ## Dependencies
 
 The application relies on:
@@ -126,8 +116,6 @@ Install all dependencies with:
 ```bash
 pip install -r requirements.txt
 ```
-
----
 
 ## Building a Standalone Executable
 
@@ -157,8 +145,6 @@ dist/IFGContrastEnhancer      # Linux/macOS
 dist/IFGContrastEnhancer.exe  # Windows
 ```
 
----
-
 ## Samples
 
 The `samples/` directory contains optional demo images.
@@ -167,8 +153,6 @@ When using the packaged executable, these images are bundled automatically (if p
 [Google Drive – LOw Light paired dataset (LOL)](https://drive.google.com/open?id=157bjO1_cFuSd0HWDUuAmcHRJDVyWpOxB)
 
 These images are provided for educational and evaluation purposes.
-
----
 
 ## Credits and Acknowledgments
 
@@ -184,11 +168,7 @@ This project provides an accessible, visual implementation for educational, rese
 
 Developed and adapted for general-purpose use by **me**.
 
----
-
 ## License
 
 This project is distributed under the **MIT License**.
 You are free to use, modify, and distribute the software, provided proper credit is given to the original authors and contributors.
-
----
