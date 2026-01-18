@@ -61,8 +61,7 @@ jobs:
       - name: Build with PyInstaller
         shell: bash
         run: |
-          pyinstaller --noconfirm --onefile --clean \
-            --name "IFGContrastEnhancer-${{ steps.version.outputs.version }}-${{ matrix.os }}" --optimize 2 main.py
+          pyinstaller --noconfirm --noconsole --onefile --clean --name "IFGContrastEnhancer-${{ steps.version.outputs.version }}-${{ matrix.os }}" --optimize 2 main.py
 
       - name: Generate checksum
         shell: bash
